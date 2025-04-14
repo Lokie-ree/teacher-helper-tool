@@ -1,51 +1,61 @@
-# Welcome to your Convex + Next.js + Clerk app
+# Virtual Teacher Assistant
 
-This is a [Convex](https://convex.dev/) project created with [`npm create convex`](https://www.npmjs.com/package/create-convex).
+A focused web application designed to help teachers organize and manage their digital resources in virtual teaching environments. This tool addresses the specific pain point of digital resource fragmentation that teachers face when teaching online.
 
-After the initial setup (<2 minutes) you'll have a working full-stack app using:
+## Project Overview
 
-- Convex as your backend (database, server logic)
-- [React](https://react.dev/) as your frontend (web page interactivity)
+Virtual Teacher Assistant provides a centralized repository for teaching materials, simple classroom management, and basic assignment tracking. It specifically targets the organizational challenges of virtual teaching while maintaining a streamlined, easy-to-learn interface.
+
+### Key Features
+
+- **Resource Organization**: Upload, categorize, and manage digital teaching materials in one place
+- **Basic Class Management**: Create virtual classrooms and manage student rosters
+- **Simple Assignment Tracking**: Create and track basic assignments linked to your resources
+- **Resource Sharing**: Share resources with colleagues to collaborate on teaching materials
+
+## Technical Stack
+
+This project is built using:
+
+- [Convex](https://convex.dev/) as the backend (database, server logic)
+- [React](https://react.dev/) as the frontend (web page interactivity)
 - [Next.js](https://nextjs.org/) for optimized web hosting and page routing
 - [Tailwind](https://tailwindcss.com/) for building great looking accessible UI
 - [Clerk](https://clerk.com/) for authentication
 
-## Get started
+## Development Setup
 
-If you just cloned this codebase and didn't use `npm create convex`, run:
+If you just cloned this codebase, run:
 
 ```
 npm install
 npm run dev
 ```
 
-If you're reading this README on GitHub and want to use this template, run:
-
-```
-npm create convex@latest -- -t nextjs-clerk
-```
-
 Then:
 
-1. Open your app. There should be a "Claim your application" button from Clerk in the bottom right of your app.
-2. Follow the steps to claim your application and link it to this app.
-3. Follow step 3 in the [Convex Clerk onboarding guide](https://docs.convex.dev/auth/clerk#get-started) to create a Convex JWT template.
-4. Uncomment the Clerk provider in `convex/auth.config.ts`
-5. Paste the Issuer URL as `CLERK_JWT_ISSUER_DOMAIN` to your dev deployment environment variable settings on the Convex dashboard (see [docs](https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances))
+1. Open the app in your browser
+2. Follow the steps to authenticate with Clerk
+3. Start organizing your teaching resources!
 
-If you want to sync Clerk user data via webhooks, check out this [example repo](https://github.com/thomasballinger/convex-clerk-users-table/).
+## Project Documentation
 
-## Learn more
+For a comprehensive understanding of this project, please refer to the Product Requirements Document:
 
-To learn more about developing your project with Convex, check out:
+- [PRD: Virtual Teacher Assistant](prd.md)
 
-- The [Tour of Convex](https://docs.convex.dev/get-started) for a thorough introduction to Convex principles.
-- The rest of [Convex docs](https://docs.convex.dev/) to learn about all Convex features.
-- [Stack](https://stack.convex.dev/) for in-depth articles on advanced topics.
+The PRD contains detailed information about the project goals, user personas, functional requirements, user stories, and implementation timeline.
 
-## Join the community
+## Learn More
 
-Join thousands of developers building full-stack apps with Convex:
+To learn more about the technologies used in this project:
 
-- Join the [Convex Discord community](https://convex.dev/community) to get help in real-time.
-- Follow [Convex on GitHub](https://github.com/get-convex/), star and contribute to the open-source implementation of Convex.
+- [Convex documentation](https://docs.convex.dev/)
+- [Next.js documentation](https://nextjs.org/docs)
+- [Clerk documentation](https://clerk.com/docs)
+- [Tailwind CSS documentation](https://tailwindcss.com/docs)
+
+## Community and Support
+
+- Join the [Convex Discord community](https://convex.dev/community) for help with the backend
+- For project-specific questions, please open an issue in this repository
