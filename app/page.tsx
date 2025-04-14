@@ -12,7 +12,20 @@ import { SignUpButton } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 
-export default function Home() {
+// Import ShadCN components
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+// Import a loading indicator (optional, but good practice)
+import { Loader2 } from "lucide-react";
+
+export default function DashboardPage() {
   return (
     <>
       <header className="sticky top-0 z-10 bg-background p-4 border-b-2 border-slate-200 dark:border-slate-800 flex flex-row justify-between items-center">
@@ -24,124 +37,94 @@ export default function Home() {
           Convex + Next.js + Clerk
         </h1>
         <Authenticated>
-          <Content />
+          <DashboardContent />
         </Authenticated>
         <Unauthenticated>
-          <SignInForm />
+          <SignInPrompt />
         </Unauthenticated>
       </main>
     </>
   );
 }
 
-function SignInForm() {
+function DashboardContent() {
+  // Fetch user resources using the new query
+  const resources = useQuery(api.myFunctions.getResources);
+
   return (
-    <div className="flex flex-col gap-8 w-96 mx-auto">
-      <p>Log in to see the numbers</p>
-      <SignInButton mode="modal">
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">
-          Sign in
-        </button>
-      </SignInButton>
-      <SignUpButton mode="modal">
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">
-          Sign up
-        </button>
-      </SignUpButton>
+    <div className="container mx-auto space-y-8">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">My Resources</h2>
+        <Button>
+          {/* TODO: Implement Upload Functionality */}Upload Resource
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Resource List</CardTitle>
+          <CardDescription>
+            Manage your uploaded teaching materials.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Handle loading state */}
+          {resources === undefined && (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          )}
+
+          {/* Handle empty state */}
+          {resources && resources.length === 0 && (
+            <p className="text-center text-muted-foreground py-8">
+              You haven't uploaded any resources yet. Click "Upload Resource" to get started!
+            </p>
+          )}
+
+          {/* Display resource list */}
+          {resources && resources.length > 0 && (
+            <ul className="space-y-2">
+              {resources.map((resource) => (
+                <li key={resource._id} className="border p-3 rounded-md flex justify-between items-center">
+                  <span>{resource.fileName}</span>
+                  {/* Add action buttons later (e.g., delete, details) */}
+                  <span className="text-sm text-muted-foreground">
+                    {/* Optional: Format date/size nicely */}
+                    Uploaded: {new Date(resource.uploadTime).toLocaleDateString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+        {/* Optional: Footer content like pagination */}
+      </Card>
     </div>
   );
 }
 
-function Content() {
-  const { viewer, numbers } =
-    useQuery(api.myFunctions.listNumbers, {
-      count: 10,
-    }) ?? {};
-  const addNumber = useMutation(api.myFunctions.addNumber);
-
-  if (viewer === undefined || numbers === undefined) {
-    return (
-      <div className="mx-auto">
-        <p>loading... (consider a loading skeleton)</p>
-      </div>
-    );
-  }
-
+function SignInPrompt() {
   return (
-    <div className="flex flex-col gap-8 max-w-lg mx-auto">
-      <p>Welcome {viewer ?? "Anonymous"}!</p>
-      <p>
-        Click the button below and open this page in another window - this data
-        is persisted in the Convex cloud database!
-      </p>
-      <p>
-        <button
-          className="bg-foreground text-background text-sm px-4 py-2 rounded-md"
-          onClick={() => {
-            void addNumber({ value: Math.floor(Math.random() * 10) });
-          }}
-        >
-          Add a random number
-        </button>
-      </p>
-      <p>
-        Numbers:{" "}
-        {numbers?.length === 0
-          ? "Click the button!"
-          : (numbers?.join(", ") ?? "...")}
-      </p>
-      <p>
-        Edit{" "}
-        <code className="text-sm font-bold font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded-md">
-          convex/myFunctions.ts
-        </code>{" "}
-        to change your backend
-      </p>
-      <p>
-        Edit{" "}
-        <code className="text-sm font-bold font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded-md">
-          app/page.tsx
-        </code>{" "}
-        to change your frontend
-      </p>
-      <p>
-        See the{" "}
-        <Link href="/server" className="underline hover:no-underline">
-          /server route
-        </Link>{" "}
-        for an example of loading data in a server component
-      </p>
-      <div className="flex flex-col">
-        <p className="text-lg font-bold">Useful resources:</p>
-        <div className="flex gap-2">
-          <div className="flex flex-col gap-2 w-1/2">
-            <ResourceCard
-              title="Convex docs"
-              description="Read comprehensive documentation for all Convex features."
-              href="https://docs.convex.dev/home"
-            />
-            <ResourceCard
-              title="Stack articles"
-              description="Learn about best practices, use cases, and more from a growing
-            collection of articles, videos, and walkthroughs."
-              href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html"
-            />
-          </div>
-          <div className="flex flex-col gap-2 w-1/2">
-            <ResourceCard
-              title="Templates"
-              description="Browse our collection of templates to get started quickly."
-              href="https://www.convex.dev/templates"
-            />
-            <ResourceCard
-              title="Discord"
-              description="Join our developer community to ask questions, trade tips & tricks,
-            and show off your projects."
-              href="https://www.convex.dev/community"
-            />
-          </div>
-        </div>
-      </div>
+    <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Welcome!</CardTitle>
+          <CardDescription>
+            Sign in to manage your teaching resources.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <SignInButton mode="modal">
+            <Button className="w-full">Sign In</Button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <Button variant="outline" className="w-full">
+              Sign Up
+            </Button>
+          </SignUpButton>
+        </CardContent>
+      </Card>
     </div>
   );
 }
