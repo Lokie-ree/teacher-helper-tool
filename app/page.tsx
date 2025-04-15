@@ -13,6 +13,7 @@ import { SignInButton } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import Link from 'next/link';
 import { useState, useEffect } from "react";
+import { FileIcon } from "@/components/FileIcon";
 
 // Import ShadCN components
 import { Button } from "@/components/ui/button";
@@ -170,23 +171,26 @@ function DashboardContent() {
               {resources.map((resource) => (
                 <li
                   key={resource._id}
-                  className="border p-3 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4"
+                  className="border p-3 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
                 >
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/resources/${resource._id}`} className="hover:underline">
-                      <span className="font-medium block truncate" title={resource.fileName}>
-                        {resource.fileName}
-                      </span>
-                    </Link>
-                    {resource.tags && resource.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {resource.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <FileIcon fileType={resource.fileType} className="h-6 w-6 text-muted-foreground flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/resources/${resource._id}`} className="hover:underline">
+                        <span className="font-medium block truncate" title={resource.fileName}>
+                          {resource.fileName}
+                        </span>
+                      </Link>
+                      {resource.tags && resource.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {resource.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
                     <span className="text-sm text-muted-foreground whitespace-nowrap">

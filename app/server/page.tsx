@@ -3,7 +3,7 @@ import { preloadQuery, preloadedQueryResult } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 
 export default async function ServerPage() {
-  const preloaded = await preloadQuery(api.myFunctions.getResources);
+  const preloaded = await preloadQuery(api.myFunctions.getResources, {});
 
   const data = preloadedQueryResult(preloaded);
 

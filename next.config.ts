@@ -7,10 +7,10 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   
-  // Disable ESLint during builds if it continues to be problematic
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
+  // Disable ESLint during builds to suppress the patching warning
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

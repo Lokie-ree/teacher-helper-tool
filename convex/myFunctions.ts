@@ -96,6 +96,27 @@ export const getUniqueTags = query({
   },
 });
 
+/**
+ * Query to get the download URL for a resource's file.
+ */
+export const getResourceUrl = query({
+  args: {
+    storageId: v.id("_storage"), // Storage ID from the resource document
+  },
+  handler: async (ctx, args) => {
+    // Check authentication if necessary (e.g., only owners can get URL)
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      // Or handle authorization based on resource ownership if needed
+      return null; // Return null if not allowed
+    }
+
+    // Get the URL for the file in storage
+    const url = await ctx.storage.getUrl(args.storageId);
+    return url;
+  },
+});
+
 // This file will contain Convex functions related to resources (upload, list, delete, tag, etc.)
 
 // Example query (replace or remove):

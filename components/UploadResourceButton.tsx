@@ -19,6 +19,22 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { Loader2, Upload } from "lucide-react";
 
+// --- Configuration Constants ---
+const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const ALLOWED_MIME_TYPES = [
+  "application/pdf",
+  "application/msword", // .doc
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  "application/vnd.ms-powerpoint", // .ppt
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
+// -----------------------------
+
 export function UploadResourceButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,9 +46,34 @@ export function UploadResourceButton() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
+    if (!file) {
+      setSelectedFile(null);
+      return;
     }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      toast.error("File Too Large", {
+        description: `Please select a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
+      });
+      event.target.value = ""; // Clear the input
+      setSelectedFile(null);
+      return;
+    }
+
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      toast.error("Invalid File Type", {
+        description: "Allowed types: PDF, DOC(X), PPT(X), JPG, PNG, GIF, WEBP.",
+        // Consider listing allowed types more dynamically if needed
+      });
+      event.target.value = ""; // Clear the input
+      setSelectedFile(null);
+      return;
+    }
+
+    // If valid, set the file
+    setSelectedFile(file);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

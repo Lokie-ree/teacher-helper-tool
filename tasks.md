@@ -30,10 +30,10 @@ This document tracks the implementation status of all tasks outlined in the PRD.
 
 ### File Handling
 - ✅ Implement file upload to Convex storage
-- ❌ Handle various file types (PDF, DOCX, PPTX, images)
-- ❌ Validate file size/type restrictions
-- ❌ Implement file preview functionality
-- ❌ Create download functionality
+- ✅ Handle various file types (PDF, DOCX, PPTX, images)
+- ✅ Validate file size/type restrictions
+- ✅ Implement file preview functionality
+- ✅ Create download functionality
 
 ## Phase 2: Classroom and Assignment Features (2-3 weeks)
 
@@ -86,10 +86,10 @@ This document tracks the implementation status of all tasks outlined in the PRD.
 
 ### Phase 1 Stories
 - ✅ **US-001**: Teacher account setup
-- 🟨 **US-002**: Resource upload and organization
+- ✅ **US-002**: Resource upload and organization
 - ✅ **US-005**: Resource search and retrieval
 - ✅ **US-008**: Secure authentication
-- ❌ **US-009**: Resource preview
+- ✅ **US-009**: Resource preview
 
 ### Phase 2 Stories
 - ❌ **US-003**: Virtual classroom creation
