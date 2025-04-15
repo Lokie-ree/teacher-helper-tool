@@ -7,7 +7,7 @@ import {
   useQuery,
 } from "convex/react";
 import { api } from "../convex/_generated/api";
-import Link from "next/link";
+import { Id } from "../convex/_generated/dataModel";
 import { SignUpButton } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
@@ -23,7 +23,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 // Import a loading indicator (optional, but good practice)
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import { UploadResourceButton } from "@/components/UploadResourceButton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
   return (
@@ -48,16 +61,26 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-  // Fetch user resources using the new query
   const resources = useQuery(api.myFunctions.getResources);
+  const deleteResource = useMutation(api.resources.deleteResource);
+
+  const handleDelete = async (resourceId: Id<"resources">, resourceName: string) => {
+    try {
+      await deleteResource({ resourceId });
+      toast.success(`Resource "${resourceName}" deleted successfully.`);
+    } catch (error) {
+      console.error("Error deleting resource:", error);
+      toast.error("Failed to delete resource", {
+        description: "An error occurred. Please try again.",
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">My Resources</h2>
-        <Button>
-          {/* TODO: Implement Upload Functionality */}Upload Resource
-        </Button>
+        <UploadResourceButton />
       </div>
 
       <Card>
@@ -68,37 +91,59 @@ function DashboardContent() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Handle loading state */}
           {resources === undefined && (
             <div className="flex justify-center items-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           )}
 
-          {/* Handle empty state */}
           {resources && resources.length === 0 && (
             <p className="text-center text-muted-foreground py-8">
               You haven't uploaded any resources yet. Click "Upload Resource" to get started!
             </p>
           )}
 
-          {/* Display resource list */}
           {resources && resources.length > 0 && (
             <ul className="space-y-2">
               {resources.map((resource) => (
-                <li key={resource._id} className="border p-3 rounded-md flex justify-between items-center">
-                  <span>{resource.fileName}</span>
-                  {/* Add action buttons later (e.g., delete, details) */}
-                  <span className="text-sm text-muted-foreground">
-                    {/* Optional: Format date/size nicely */}
+                <li
+                  key={resource._id}
+                  className="border p-3 rounded-md flex justify-between items-center gap-4"
+                >
+                  <span className="flex-1 truncate" title={resource.fileName}>{resource.fileName}</span>
+                  <span className="text-sm text-muted-foreground flex-shrink-0">
                     Uploaded: {new Date(resource.uploadTime).toLocaleDateString()}
                   </span>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="icon">
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete Resource</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the
+                          resource "<span className="font-semibold">{resource.fileName}</span>" and remove its data from our servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(resource._id, resource.fileName)}
+                        >
+                          Continue
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </li>
               ))}
             </ul>
           )}
         </CardContent>
-        {/* Optional: Footer content like pagination */}
       </Card>
     </div>
   );

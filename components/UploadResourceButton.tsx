@@ -1,0 +1,135 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useMutation, useAction } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
+import { Loader2, Upload } from "lucide-react";
+
+export function UploadResourceButton() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const generateUploadUrl = useAction(api.files.generateUploadUrl);
+  const createResource = useMutation(api.resources.createResource);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!selectedFile) {
+      toast.error("No File Selected", {
+        description: "Please select a file to upload.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 1. Generate Upload URL
+      const uploadUrl = await generateUploadUrl();
+
+      // 2. Upload File
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        body: selectedFile,
+      });
+
+      if (!result.ok) {
+        throw new Error(`Upload failed: ${await result.text()}`);
+      }
+
+      const { storageId } = await result.json();
+
+      // 3. Create Resource Record in DB
+      await createResource({
+        storageId: storageId,
+        fileName: selectedFile.name,
+        fileType: selectedFile.type,
+        size: selectedFile.size,
+        // tags: [], // TODO: Add tag input later
+      });
+
+      toast.success("Upload Successful", {
+        description: `"${selectedFile.name}" has been uploaded.`,
+      });
+
+      // Reset state and close dialog
+      setSelectedFile(null);
+      setIsOpen(false);
+      // Optionally, trigger a refresh of the resource list here
+
+    } catch (error) {
+      console.error("Error uploading resource:", error);
+      toast.error("Upload Failed", {
+        description: "An error occurred while uploading the file. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Upload className="mr-2 h-4 w-4" /> Upload Resource
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Upload New Resource</DialogTitle>
+          <DialogDescription>
+            Select a file from your device to upload it.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="file-upload" className="text-right">
+              File
+            </Label>
+            <Input
+              id="file-upload"
+              type="file"
+              onChange={handleFileChange}
+              className="col-span-3"
+              disabled={isSubmitting}
+            />
+          </div>
+          {/* TODO: Add input for tags here later */} 
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" disabled={isSubmitting}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={!selectedFile || isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} 
+              {isSubmitting ? "Uploading..." : "Upload"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+} 
