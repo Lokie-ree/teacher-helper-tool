@@ -23,6 +23,7 @@ export function UploadResourceButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [tags, setTags] = useState("");
 
   const generateUploadUrl = useAction(api.files.generateUploadUrl);
   const createResource = useMutation(api.resources.createResource);
@@ -45,11 +46,14 @@ export function UploadResourceButton() {
 
     setIsSubmitting(true);
 
+    const tagArray = tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag !== "");
+
     try {
-      // 1. Generate Upload URL
       const uploadUrl = await generateUploadUrl();
 
-      // 2. Upload File
       const result = await fetch(uploadUrl, {
         method: "POST",
         body: selectedFile,
@@ -61,23 +65,21 @@ export function UploadResourceButton() {
 
       const { storageId } = await result.json();
 
-      // 3. Create Resource Record in DB
       await createResource({
         storageId: storageId,
         fileName: selectedFile.name,
         fileType: selectedFile.type,
         size: selectedFile.size,
-        // tags: [], // TODO: Add tag input later
+        tags: tagArray,
       });
 
       toast.success("Upload Successful", {
         description: `"${selectedFile.name}" has been uploaded.`,
       });
 
-      // Reset state and close dialog
       setSelectedFile(null);
+      setTags("");
       setIsOpen(false);
-      // Optionally, trigger a refresh of the resource list here
 
     } catch (error) {
       console.error("Error uploading resource:", error);
@@ -100,7 +102,7 @@ export function UploadResourceButton() {
         <DialogHeader>
           <DialogTitle>Upload New Resource</DialogTitle>
           <DialogDescription>
-            Select a file from your device to upload it.
+            Select a file and optionally add comma-separated tags.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -111,12 +113,25 @@ export function UploadResourceButton() {
             <Input
               id="file-upload"
               type="file"
+              required
               onChange={handleFileChange}
               className="col-span-3"
               disabled={isSubmitting}
             />
           </div>
-          {/* TODO: Add input for tags here later */} 
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="tags-input" className="text-right">
+              Tags
+            </Label>
+            <Input
+              id="tags-input"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="e.g., science, grade-9, worksheet"
+              className="col-span-3"
+              disabled={isSubmitting}
+            />
+          </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="secondary" disabled={isSubmitting}>
@@ -124,7 +139,7 @@ export function UploadResourceButton() {
               </Button>
             </DialogClose>
             <Button type="submit" disabled={!selectedFile || isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} 
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isSubmitting ? "Uploading..." : "Upload"}
             </Button>
           </DialogFooter>

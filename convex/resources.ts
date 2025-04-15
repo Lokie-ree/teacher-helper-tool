@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 
@@ -85,6 +85,44 @@ export const deleteResource = mutation({
 
     // Return null to indicate successful deletion.
     return null;
+  },
+});
+
+/**
+ * Query to retrieve a single resource by its ID.
+ * It also checks if the current user is authorized to view it.
+ */
+export const getResourceById = query({
+  args: {
+    resourceId: v.id("resources"), // The ID of the resource to fetch.
+  },
+  handler: async (ctx, args) => {
+    // Get the identity of the currently logged-in user.
+    const identity = await ctx.auth.getUserIdentity();
+
+    // If the user is not authenticated, return null or throw error depending on desired behavior.
+    if (!identity) {
+      // For this case, we return null if not logged in, as the page might handle this.
+      return null;
+    }
+
+    // Retrieve the resource document.
+    const resource = await ctx.db.get(args.resourceId);
+
+    // If the resource doesn't exist, return null.
+    if (!resource) {
+      return null;
+    }
+
+    // Check if the logged-in user is the owner of the resource.
+    // In the future, you might add logic here for shared resources.
+    if (resource.userId !== identity.subject) {
+      // If not the owner, return null (or throw an unauthorized error).
+      return null;
+    }
+
+    // Return the resource document if the user is authorized.
+    return resource;
   },
 });
 

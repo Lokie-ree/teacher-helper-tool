@@ -11,6 +11,7 @@ import { Id } from "../convex/_generated/dataModel";
 import { SignUpButton } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
+import Link from 'next/link';
 
 // Import ShadCN components
 import { Button } from "@/components/ui/button";
@@ -18,10 +19,10 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 // Import a loading indicator (optional, but good practice)
 import { Loader2, Trash2 } from "lucide-react";
 import { UploadResourceButton } from "@/components/UploadResourceButton";
@@ -104,41 +105,58 @@ function DashboardContent() {
           )}
 
           {resources && resources.length > 0 && (
-            <ul className="space-y-2">
+            <ul className="space-y-4">
               {resources.map((resource) => (
                 <li
                   key={resource._id}
-                  className="border p-3 rounded-md flex justify-between items-center gap-4"
+                  className="border p-3 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4"
                 >
-                  <span className="flex-1 truncate" title={resource.fileName}>{resource.fileName}</span>
-                  <span className="text-sm text-muted-foreground flex-shrink-0">
-                    Uploaded: {new Date(resource.uploadTime).toLocaleDateString()}
-                  </span>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete Resource</span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the
-                          resource "<span className="font-semibold">{resource.fileName}</span>" and remove its data from our servers.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(resource._id, resource.fileName)}
-                        >
-                          Continue
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/resources/${resource._id}`} className="hover:underline">
+                      <span className="font-medium block truncate" title={resource.fileName}>
+                        {resource.fileName}
+                      </span>
+                    </Link>
+                    {resource.tags && resource.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {resource.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      {new Date(resource.uploadTime).toLocaleDateString()}
+                    </span>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete Resource</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the
+                            resource "<span className="font-semibold">{resource.fileName}</span>" and remove its data from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(resource._id, resource.fileName)}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </li>
               ))}
             </ul>
