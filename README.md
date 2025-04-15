@@ -23,6 +23,15 @@ This project is built using:
 - [Tailwind](https://tailwindcss.com/) for building great looking accessible UI
 - [Clerk](https://clerk.com/) for authentication
 
+## Current Status
+
+**Phase 1: Core Resource Management is complete.** The application currently allows users to:
+
+- Authenticate (sign up / log in)
+- Upload, view, categorize (tag), search, filter, preview, download, and delete digital teaching resources.
+
+Phase 2 (Classroom & Assignment Features) and Phase 3 (Sharing & Refinement) are planned next.
+
 ## Development Setup
 
 If you just cloned this codebase, run:
@@ -40,11 +49,12 @@ Then:
 
 ## Project Documentation
 
-For a comprehensive understanding of this project, please refer to the Product Requirements Document:
+For a comprehensive understanding of this project, please refer to the Product Requirements Document and Task Tracker:
 
 - [PRD: Virtual Teacher Assistant](prd.md)
+- [Task Tracker](tasks.md)
 
-The PRD contains detailed information about the project goals, user personas, functional requirements, user stories, and implementation timeline.
+The PRD contains detailed information about the project goals, user personas, functional requirements, user stories, and implementation timeline. The Task Tracker shows the current implementation status of features across phases.
 
 ## Learn More
 

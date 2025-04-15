@@ -1,277 +1,288 @@
 "use client";
 
-import {
-  Authenticated,
-  Unauthenticated,
-  useMutation,
-  useQuery,
-} from "convex/react";
-import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
-import { SignUpButton } from "@clerk/nextjs";
-import { SignInButton } from "@clerk/nextjs";
-import { UserButton } from "@clerk/nextjs";
-import Link from 'next/link';
-import { useState, useEffect } from "react";
-import { FileIcon } from "@/components/FileIcon";
-
-// Import ShadCN components
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-// Import a loading indicator (optional, but good practice)
-import { Loader2, Trash2 } from "lucide-react";
-import { UploadResourceButton } from "@/components/UploadResourceButton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { RetroGrid } from "@/components/magicui/retro-grid";
+import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
+import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
+import { FileTextIcon, MagnifyingGlassIcon, EyeOpenIcon } from "@radix-ui/react-icons";
+import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 
-// Custom hook for debouncing
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+// Example feature data - replace with your actual features
+const features = [
+  {
+    Icon: FileTextIcon,
+    name: "Resource Hub",
+    description: "Upload, tag, and manage all your digital teaching materials.",
+    href: "#",
+    cta: "Explore Hub",
+    background: <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full transform-gpu [mask-image:linear-gradient(to_bottom,transparent,white)]"></div>,
+    className: "col-span-3 lg:col-span-1",
+  },
+  {
+    Icon: MagnifyingGlassIcon,
+    name: "Smart Search",
+    description: "Quickly find the exact resource you need with powerful filters.",
+    href: "#",
+    cta: "Try Search",
+    background: <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full transform-gpu [mask-image:linear-gradient(to_bottom,transparent,white)]"></div>,
+    className: "col-span-3 lg:col-span-1",
+  },
+  {
+    Icon: EyeOpenIcon,
+    name: "Easy Previews",
+    description: "Preview documents, images, and presentations directly in the app.",
+    href: "#",
+    cta: "See Previews",
+    background: <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full transform-gpu [mask-image:linear-gradient(to_bottom,transparent,white)]"></div>,
+    className: "col-span-3 lg:col-span-1",
+  },
+];
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    // Cleanup function that clears the timeout
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]); // Only re-call effect if value or delay changes
-
-  return debouncedValue;
-}
-
-export default function DashboardPage() {
+export default function LandingPage() {
   return (
-    <>
-      <header className="sticky top-0 z-10 bg-background p-4 border-b-2 border-slate-200 dark:border-slate-800 flex flex-row justify-between items-center">
-        Convex + Next.js + Clerk
-        <UserButton />
-      </header>
-      <main className="p-8 flex flex-col gap-8">
-        <h1 className="text-4xl font-bold text-center">
-          Convex + Next.js + Clerk
-        </h1>
-        <Authenticated>
-          <DashboardContent />
-        </Authenticated>
-        <Unauthenticated>
-          <SignInPrompt />
-        </Unauthenticated>
-      </main>
-    </>
-  );
-}
-
-function DashboardContent() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string>("all");
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
-
-  const uniqueTags = useQuery(api.myFunctions.getUniqueTags);
-
-  const resources = useQuery(
-    api.myFunctions.getResources,
-    {
-      searchQuery: debouncedSearchQuery || undefined,
-      selectedTag: selectedTag === "all" ? undefined : selectedTag,
-    }
-  );
-  const deleteResource = useMutation(api.resources.deleteResource);
-
-  const handleDelete = async (resourceId: Id<"resources">, resourceName: string): Promise<void> => {
-    try {
-      await deleteResource({ resourceId });
-      toast.success(`Resource "${resourceName}" deleted successfully.`);
-    } catch (error) {
-      console.error("Error deleting resource:", error);
-      toast.error("Failed to delete resource", {
-        description: "An error occurred. Please try again.",
-      });
-    }
-  };
-
-  return (
-    <div className="container mx-auto space-y-8">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">My Resources</h2>
-        <UploadResourceButton />
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-4 mb-4">
-        <Input
-          placeholder="Search by filename..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-sm"
-        />
-        <Select value={selectedTag} onValueChange={setSelectedTag}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter by tag..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Tags</SelectItem>
-            {uniqueTags?.map((tag) => (
-              <SelectItem key={tag} value={tag}>
-                {tag}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Resource List</CardTitle>
-          <CardDescription>
-            Manage your uploaded teaching materials.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {resources === undefined && (
-            <div className="flex justify-center items-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <MaxWidthWrapper>
+          <div className="flex h-14 items-center justify-between">
+            <div className="flex md:flex-1">
+              <Link href="/" className="flex items-center space-x-2">
+                {/* <Icons.logo className="h-6 w-6" /> TODO: Add logo */}
+                <span className="font-bold">
+                  Virtual Teacher Assistant
+                </span>
+              </Link>
+              <nav className="hidden md:flex items-center space-x-6 ml-6">
+                <Link href="#features" className="text-sm font-medium hover:text-primary">Features</Link>
+                <Link href="#how-it-works" className="text-sm font-medium hover:text-primary">How it Works</Link>
+                <Link href="#testimonials" className="text-sm font-medium hover:text-primary">Testimonials</Link>
+              </nav>
             </div>
-          )}
+            <div className="flex items-center space-x-4">
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button variant="ghost" size="sm" className="hidden md:inline-flex">Sign In</Button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <Button size="sm">Sign Up</Button>
+                </SignUpButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard">
+                   <Button variant="outline" size="sm">Dashboard</Button>
+                </Link>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <span className="sr-only">Toggle menu</span>
+                {/* Add menu icon here */}
+              </Button>
+            </div>
+          </div>
+        </MaxWidthWrapper>
+      </header>
 
-          {resources && resources.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">
-              You haven't uploaded any resources yet. Click "Upload Resource" to get started!
-            </p>
-          )}
+      {/* Main Content */}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section id="hero" className="relative isolate overflow-hidden">
+          <MaxWidthWrapper>
+            <div className="py-16 md:py-24 lg:py-32 text-center">
+              <RetroGrid className="absolute inset-0 z-[-1]" />
+              <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1">
+                <h1 className="text-4xl font-extrabold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+                  Organize Your Digital Classroom
+                </h1>
+              </AnimatedShinyText>
 
-          {resources && resources.length > 0 && (
-            <ul className="space-y-4">
-              {resources.map((resource) => (
-                <li
-                  key={resource._id}
-                  className="border p-3 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <FileIcon fileType={resource.fileType} className="h-6 w-6 text-muted-foreground flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <Link href={`/resources/${resource._id}`} className="hover:underline">
-                        <span className="font-medium block truncate" title={resource.fileName}>
-                          {resource.fileName}
-                        </span>
-                      </Link>
-                      {resource.tags && resource.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {resource.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">
-                      {new Date(resource.uploadTime).toLocaleDateString()}
-                    </span>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="icon">
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete Resource</span>
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the
-                            resource "<span className="font-semibold">{resource.fileName}</span>" and remove its data from our servers.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(resource._id, resource.fileName)}
-                          >
-                            Continue
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="mx-auto mt-6 max-w-[600px] text-lg text-muted-foreground sm:text-xl"
+              >
+                Spend less time searching, more time teaching. Your central hub for virtual resources.
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4"
+              >
+                <SignedOut>
+                  <SignUpButton mode="modal">
+                     <Button size="lg" className="w-full sm:w-auto">Get Started Free</Button>
+                  </SignUpButton>
+                  <Link href="#features" className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto">Learn More</Button>
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/dashboard" className="w-full sm:w-auto">
+                     <Button size="lg" className="w-full">Go to Dashboard</Button>
+                  </Link>
+                  <Link href="#features" className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="w-full">Learn More</Button>
+                  </Link>
+                </SignedIn>
+              </motion.div>
+            </div>
+          </MaxWidthWrapper>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="bg-secondary">
+          <MaxWidthWrapper>
+            <div className="py-16 md:py-24">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                viewport={{ once: true }}
+                className="text-center"
+              >
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+                  Streamline Your Workflow
+                </h2>
+                <p className="mt-4 text-muted-foreground mx-auto max-w-[600px]">
+                  Everything you need, right where you need it.
+                </p>
+              </motion.div>
+
+              <motion.div
+                 initial={{ opacity: 0, y: 20 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 transition={{ delay: 0.4, duration: 0.5 }}
+                 viewport={{ once: true }}
+                 className="mt-12"
+              >
+                <BentoGrid className="auto-rows-[20rem]">
+                  {features.map((feature) => (
+                    <BentoCard key={feature.name} {...feature} />
+                  ))}
+                </BentoGrid>
+              </motion.div>
+            </div>
+          </MaxWidthWrapper>
+        </section>
+
+        {/* How It Works Section */}
+        <section id="how-it-works">
+          <MaxWidthWrapper>
+            <div className="py-16 md:py-24">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+                  How It Works
+                </h2>
+                <p className="mt-4 text-muted-foreground mx-auto max-w-[600px]">
+                  Explain the process in simple steps.
+                </p>
+              </div>
+              <div className="mt-12 grid gap-8 md:grid-cols-3">
+                <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+                  <h3 className="text-lg font-semibold mb-2">Step 1</h3>
+                  <p className="text-muted-foreground">Step 1 Info</p>
+                </div>
+                <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+                  <h3 className="text-lg font-semibold mb-2">Step 2</h3>
+                  <p className="text-muted-foreground">Step 2 Info</p>
+                </div>
+                <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+                  <h3 className="text-lg font-semibold mb-2">Step 3</h3>
+                  <p className="text-muted-foreground">Step 3 Info</p>
+                </div>
+              </div>
+            </div>
+          </MaxWidthWrapper>
+        </section>
+
+        {/* Testimonials Section */}
+        <section id="testimonials" className="bg-secondary">
+          <MaxWidthWrapper>
+            <div className="py-16 md:py-24">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+                  What Teachers Say
+                </h2>
+                <p className="mt-4 text-muted-foreground mx-auto max-w-[600px]">
+                  Hear from educators who use our platform every day.
+                </p>
+              </div>
+              <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+                  <blockquote className="text-muted-foreground">Quote 1</blockquote>
+                </div>
+                <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+                  <blockquote className="text-muted-foreground">Quote 2</blockquote>
+                </div>
+                <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+                  <blockquote className="text-muted-foreground">Quote 3</blockquote>
+                </div>
+              </div>
+            </div>
+          </MaxWidthWrapper>
+        </section>
+
+        {/* CTA Section */}
+        <section id="cta">
+          <MaxWidthWrapper>
+            <div className="py-16 md:py-24">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+                  Ready to Get Started?
+                </h2>
+                <p className="mt-4 text-muted-foreground mx-auto max-w-[600px]">
+                  Join now and streamline your virtual teaching workflow.
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+                  <SignedOut>
+                    <SignUpButton mode="modal">
+                      <Button size="lg" className="w-full sm:w-auto">Sign Up for Free</Button>
+                    </SignUpButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link href="/dashboard" className="w-full sm:w-auto">
+                      <Button size="lg" className="w-full">Go to Dashboard</Button>
+                    </Link>
+                  </SignedIn>
+                </div>
+              </div>
+            </div>
+          </MaxWidthWrapper>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t bg-muted">
+        <MaxWidthWrapper>
+          <div className="py-6 md:py-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground text-center md:text-left">
+                © {new Date().getFullYear()} Virtual Teacher Assistant. All rights reserved.
+              </p>
+              <nav className="flex gap-6">
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Terms
+                </Link>
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy
+                </Link>
+              </nav>
+            </div>
+          </div>
+        </MaxWidthWrapper>
+      </footer>
     </div>
   );
 }
 
-function SignInPrompt() {
-  return (
-    <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Welcome!</CardTitle>
-          <CardDescription>
-            Sign in to manage your teaching resources.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <SignInButton mode="modal">
-            <Button className="w-full">Sign In</Button>
-          </SignInButton>
-          <SignUpButton mode="modal">
-            <Button variant="outline" className="w-full">
-              Sign Up
-            </Button>
-          </SignUpButton>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+// Placeholder components for Terms and Privacy pages (or link to actual pages)
+// You might want to create these as separate files later
+// e.g., app/terms/page.tsx and app/privacy/page.tsx
 
-function ResourceCard({
-  title,
-  description,
-  href,
-}: {
-  title: string;
-  description: string;
-  href: string;
-}) {
-  return (
-    <div className="flex flex-col gap-2 bg-slate-200 dark:bg-slate-800 p-4 rounded-md h-28 overflow-auto">
-      <a href={href} className="text-sm underline hover:no-underline">
-        {title}
-      </a>
-      <p className="text-xs">{description}</p>
-    </div>
-  );
-}
+// Example inline placeholder:
+// const TermsPage = () => <div>Terms of Service Placeholder</div>;
+// const PrivacyPage = () => <div>Privacy Policy Placeholder</div>; 
