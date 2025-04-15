@@ -1,0 +1,21 @@
+export { default as Gemini } from './integrations/Gemini'
+export { default as Replit } from './integrations/Replit'
+export { default as MagicUI } from './integrations/MagicUI'
+export { default as VSCodium } from './integrations/VSCodium'
+export { default as MediaWiki } from './integrations/MediaWiki'
+export { default as GooglePaLM } from './integrations/GooglePaLM'
+
+// Add exports for other moved components
+export { default as HeroSection } from './sections/HeroSection'
+export { default as FeaturesSection } from './sections/FeaturesSection'
+export { default as HowItWorksSection } from './sections/HowItWorksSection'
+export { default as TestimonialsSection } from './sections/TestimonialsSection'
+export { default as CtaSection } from './sections/CtaSection'
+export { default as integrations5 } from './integrations/integrations-5' // Consider renaming integrations-5.tsx
+export { default as Navbar } from './common/Navbar'
+export { default as Footer } from './common/Footer'
+export { default as Logo } from './common/logo'
+export { default as FileIcon } from './common/FileIcon'
+export { default as MaxWidthWrapper } from './common/MaxWidthWrapper'
+export { default as UploadResourceButton } from './common/UploadResourceButton'
+export { default as ConvexClientProvider } from './common/ConvexClientProvider'

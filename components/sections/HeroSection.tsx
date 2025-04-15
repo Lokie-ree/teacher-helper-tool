@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { RetroGrid } from "@/components/magicui/retro-grid";
 import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/components/common/MaxWidthWrapper";
 
 export default function HeroSection() {
   return (

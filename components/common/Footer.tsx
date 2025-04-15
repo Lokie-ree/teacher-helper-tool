@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/components/common/MaxWidthWrapper";
 
 export default function Footer() {
     return (

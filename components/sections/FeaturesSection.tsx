@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
 import { FileTextIcon, MagnifyingGlassIcon, EyeOpenIcon } from "@radix-ui/react-icons";
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/components/common/MaxWidthWrapper";
 
 // Feature data moved here from page.tsx
 const features = [

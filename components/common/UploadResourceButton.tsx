@@ -35,7 +35,7 @@ const ALLOWED_MIME_TYPES = [
 ];
 // -----------------------------
 
-export function UploadResourceButton() {
+const UploadResourceButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -188,4 +188,6 @@ export function UploadResourceButton() {
       </DialogContent>
     </Dialog>
   );
-} 
+};
+
+export default UploadResourceButton; 

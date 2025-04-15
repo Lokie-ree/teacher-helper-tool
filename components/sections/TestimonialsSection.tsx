@@ -1,6 +1,6 @@
 "use client";
 
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/components/common/MaxWidthWrapper";
 
 // You might want to fetch testimonials dynamically later
 const testimonials = [

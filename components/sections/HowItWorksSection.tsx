@@ -1,6 +1,6 @@
 "use client";
 
-import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import MaxWidthWrapper from "@/components/common/MaxWidthWrapper";
 
 export default function HowItWorksSection() {
     return (

@@ -13,8 +13,7 @@ import { SignInButton } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import Link from 'next/link';
 import { useState, useEffect } from "react";
-import { FileIcon } from "@/components/FileIcon";
-
+import FileIcon from "@/components/common/FileIcon";
 // Import ShadCN components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +27,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 // Import a loading indicator (optional, but good practice)
 import { Loader2, Trash2 } from "lucide-react";
-import { UploadResourceButton } from "@/components/UploadResourceButton";
+import UploadResourceButton from "@/components/common/UploadResourceButton";
 import {
   AlertDialog,
   AlertDialogAction,

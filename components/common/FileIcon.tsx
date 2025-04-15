@@ -16,7 +16,7 @@ type FileIconProps = {
 /**
  * Renders an icon based on the file's MIME type.
  */
-export function FileIcon({ fileType, className }: FileIconProps): React.ReactElement {
+const FileIcon = ({ fileType, className }: FileIconProps): React.ReactElement => {
   if (!fileType) {
     return <File className={className} />; // Default icon
   }
@@ -39,5 +39,7 @@ export function FileIcon({ fileType, className }: FileIconProps): React.ReactEle
 
   return <File className={className} />; // Default fallback icon
 }
+
+export default FileIcon;
 
  

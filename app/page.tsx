@@ -1,10 +1,10 @@
 "use client";
 
-import HeroSection from "@/components/HeroSection";
-import FeaturesSection from "@/components/FeaturesSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import CtaSection from "@/components/CtaSection";
+import HeroSection from "@/components/sections/HeroSection";
+import FeaturesSection from "@/components/sections/FeaturesSection";
+import HowItWorksSection from "@/components/sections/HowItWorksSection";
+import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import CtaSection from "@/components/sections/CtaSection";
 
 export default function LandingPage() {
   return (

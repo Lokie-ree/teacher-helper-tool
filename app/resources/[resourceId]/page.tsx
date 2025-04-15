@@ -7,7 +7,7 @@ import { Id } from '@/convex/_generated/dataModel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowLeft, Download } from 'lucide-react';
-import { FileIcon } from "@/components/FileIcon";
+import FileIcon from "@/components/common/FileIcon";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Authenticated, Unauthenticated } from 'convex/react';
