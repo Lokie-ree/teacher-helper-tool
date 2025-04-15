@@ -19,7 +19,11 @@ export default defineSchema({
     // Indexing userId will be crucial for fetching resources for the logged-in user
     .index("by_userId", ["userId"])
     // Optional: Indexing tags might be useful for searching/filtering later
-    .index("by_tags", ["tags"]),
+    .index("by_tags", ["tags"])
+    // Add search index on the fileName field
+    .searchIndex("search_fileName", {
+      searchField: "fileName",
+    }),
 
   // We can add tables for classes, assignments etc. later
 });

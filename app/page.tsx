@@ -12,9 +12,11 @@ import { SignUpButton } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import Link from 'next/link';
+import { useState, useEffect } from "react";
 
 // Import ShadCN components
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -38,6 +40,31 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Custom hook for debouncing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    // Cleanup function that clears the timeout
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]); // Only re-call effect if value or delay changes
+
+  return debouncedValue;
+}
 
 export default function DashboardPage() {
   return (
@@ -62,10 +89,22 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-  const resources = useQuery(api.myFunctions.getResources);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string>("all");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const uniqueTags = useQuery(api.myFunctions.getUniqueTags);
+
+  const resources = useQuery(
+    api.myFunctions.getResources,
+    {
+      searchQuery: debouncedSearchQuery || undefined,
+      selectedTag: selectedTag === "all" ? undefined : selectedTag,
+    }
+  );
   const deleteResource = useMutation(api.resources.deleteResource);
 
-  const handleDelete = async (resourceId: Id<"resources">, resourceName: string) => {
+  const handleDelete = async (resourceId: Id<"resources">, resourceName: string): Promise<void> => {
     try {
       await deleteResource({ resourceId });
       toast.success(`Resource "${resourceName}" deleted successfully.`);
@@ -79,9 +118,31 @@ function DashboardContent() {
 
   return (
     <div className="container mx-auto space-y-8">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold">My Resources</h2>
         <UploadResourceButton />
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <Input
+          placeholder="Search by filename..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-sm"
+        />
+        <Select value={selectedTag} onValueChange={setSelectedTag}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filter by tag..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Tags</SelectItem>
+            {uniqueTags?.map((tag) => (
+              <SelectItem key={tag} value={tag}>
+                {tag}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <Card>

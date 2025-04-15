@@ -24,9 +24,9 @@ This document tracks the implementation status of all tasks outlined in the PRD.
 - ✅ Create basic dashboard layout
 - ✅ Implement resource list view
 - ✅ Create upload resource UI (file input, progress indication)
-- ❌ Implement resource tagging UI
-- ❌ Create resource detail view
-- ❌ Add search/filter functionality
+- ✅ Implement resource tagging UI
+- ✅ Create resource detail view
+- ✅ Add search/filter functionality
 
 ### File Handling
 - ✅ Implement file upload to Convex storage
@@ -87,7 +87,7 @@ This document tracks the implementation status of all tasks outlined in the PRD.
 ### Phase 1 Stories
 - ✅ **US-001**: Teacher account setup
 - 🟨 **US-002**: Resource upload and organization
-- ❌ **US-005**: Resource search and retrieval
+- ✅ **US-005**: Resource search and retrieval
 - ✅ **US-008**: Secure authentication
 - ❌ **US-009**: Resource preview
 
